@@ -1,6 +1,6 @@
-# RECOIL MEASUREMENT
-This is a project to measure the recoil of a rifle in order to experiment with different cartridges and
-muzzle brakes.
+# RECOIL data capture
+This is a hardware/software project to measure the recoil of a rifle in order to experiment with different 
+cartridges and muzzle brakes.
 
 ## Components
 
