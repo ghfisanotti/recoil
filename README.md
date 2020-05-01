@@ -8,10 +8,10 @@ muzzle brakes.
 
 - Raspberry Pi SBC to receive the values acquired by the Arduino, store and display them.
 
-- Logic-level converter (2-ports) to connect Raspberry (3.3 volts) I2C bus to Arduino (5 volts) I2C bus,
-in theory, as long as the Arduino is configured as slave, it is possible to connect the Raspberry to the Arduino 
-with no risk, but that requires to be shure the Arduino is programmed correctly before connecting both devices.
-If done incorrectly, you may damage the Raspberry permanently.
+- Logic-level bi-directional converter (2-channels) to connect Raspberry (3.3 volts) I2C bus to Arduino (5 volts) 
+I2C bus.  In theory, as long as the Arduino is configured as slave, it is possible to connect the Raspberry to the 
+Arduino with no risk, but that requires to be shure the Arduino is programmed correctly before connecting both 
+devices.  If done incorrectly, you may damage the Raspberry permanently.
 
 ## Communications
 Arduino and Raspberry are connected by an I2C bus, Raspberry as master, Arduino as slave.
