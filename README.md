@@ -39,12 +39,13 @@ CSV files can also be imported into any spreadsheet utility for further analysis
 4. On the Raspberry:
 
 `
-   ./i2c-read-recoil.sh
+	./i2c-read-recoil.sh
 `
+
 5. Repeat previous steps as desired
 6. To graph the captured data, on the Raspberry:
 
 `
-  ./plot.sh
+	./plot.sh
 `
 
