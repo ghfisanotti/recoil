@@ -4,7 +4,7 @@ muzzle brakes.
 
 ## Components
 
-- Arduino Nano microcontroller to read the value of a potentiometer as it is moved by the recoil of the rifle
+- Arduino Nano microcontroller to read the value of a potentiometer as it is moved by the recoil of the rifle.
 
 - Raspberry Pi SBC to receive the values acquired by the Arduino, store and display them.
 
@@ -25,12 +25,16 @@ A Python process on the Raspberry receives the CSV, stores it as a file on disk 
 - `*.py`: Python programs
 
 ## Usage:
-. Move potentiometer to zero-position, Arduino should turn green LED on, yellow off
-. Fire rifle
-. Potentiometer should have moved to max-position, Arduino should turn yellow LED on, green off
-. On the Raspberry
-  ./i2c-read-recoil.sh
-. Repeat previous steps as desired
-. To graph the captured data, on the Raspberry:
+1. Move potentiometer to zero-position, Arduino should turn green LED on, yellow off
+2. Fire rifle
+3. Potentiometer should have moved to max-position, Arduino should turn yellow LED on, green off
+4. On the Raspberry:
+`
+   ./i2c-read-recoil.sh
+`
+5. Repeat previous steps as desired
+6. To graph the captured data, on the Raspberry:
+`
   ./plot.sh
+`
 
