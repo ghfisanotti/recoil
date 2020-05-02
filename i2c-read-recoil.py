@@ -1,3 +1,7 @@
+# Function: Request CSV file from Arduino on I2C bus,
+#           write each line to standar output
+# Author: Gerardo Fisanotti - 1-may-2020
+#
 from smbus import SMBus
 import sys
 import time
