@@ -13,10 +13,11 @@ se=sys.stderr
 retryCnt=0
 while 1==1 :
   try:
-    d = bus.read_i2c_block_data(addr,0,12) # slave addr, ???, bytes to read
+    d = bus.read_i2c_block_data(addr,0,14) # slave addr, ???, bytes to read
     t=""
+    retryCnt=0
     for i in range(len(d)) : t+=chr(d[i])
-    if t=="     0,    0" : break
+    if t=="       0,    0" : break
     so.write(t + '\n')
   except:
     se.write('I/O error, retrying...\n')

@@ -1,48 +1,48 @@
 /*
- * Author: Gerardo Fisanotti - 30-mar-2020
+ * Author: Gerardo Fisanotti - 30-may-2020
  * Function: Read the impulse of a rifle recoil by reading time and analog value of a 
  *           variable resistor moved by the energy of the recoil
- *           Will send results (microseconds/100, voltage) via I2C bus to a requesting master.
- * Hardware: Arduino Nano, 
- *           pin A4(SDA) to Raspberry GPIO pin #3 (SDA) thru logic level bi-directional converter
- *           pin A5(SCL) to Raspberry GPIO pin #5 (SCL) thru logic level bi-directional converter 
- *           pin A0 to wiper of measuring variable resistor, extremes of resistor to 5V and ground
- *           pin D11 to green LED anode thru 220 ohm resistor, LED cathode to ground
- *           pin D12 to yellow LED anode thru 220 ohm resistor, LED cathode to ground
+ *           Will send results (microseconds, voltage) via I2C bus to a requesting master.
+ * Hardware: MCU D1 Mini (ESP8266 based), 
+ *           MCU pin D2-(SDA) to Raspberry GPIO pin #3 (SDA) 
+ *           MCU pin D1-(SCL) to Raspberry GPIO pin #5 (SCL) 
+ *           MCU pin A0 to wiper of measuring variable resistor, extremes of resistor to 3.3V and GND
+ *           MCU pin D6 to green LED anode thru 220 ohm resistor, LED cathode to ground
+ *           MCU pin D7 to yellow LED anode thru 220 ohm resistor, LED cathode to ground
  */
  
 #include <Wire.h>
 
 const int pot=A0; //potentiometer wiper
-const int maxSample=350; //Max # of samples to be stored
-const int readyLED=11; //green LED, ready to take samples
-const int finishedLED=12; //Yellow LED, waiting for I2C master to read values
+const int maxSample=1025; //Max # of samples to be stored
+const int readyLED=D6; //green LED, ready to take samples
+const int finishedLED=D7; //Yellow LED, waiting for I2C master to read values
 unsigned long bt=0;
 unsigned count=0; 
-byte ant=0;
-unsigned tim_a[maxSample];
+unsigned ant=0;
+unsigned long tim_a[maxSample];
+unsigned val;
 unsigned val_a[maxSample];
-bool finished=false;
-char line[13];
+bool finished=true;
+char line[16];
 volatile unsigned next=0;
 
 void setup() {
   pinMode(pot, INPUT);
   pinMode(readyLED, OUTPUT);
   pinMode(finishedLED, OUTPUT);
-  Serial.begin(19200);
-  Wire.begin(8);                // join i2c bus as slave with address #8
+  Serial.begin(115200);
+  Wire.begin(0x08);                // join i2c bus as slave with address #8
   Wire.onRequest(requestEvent); // register event
-  getReady();
 }
 
 void requestEvent() {
   if (next < count) {
-    sprintf(line, "%6u, %4u", tim_a[next], val_a[next]);
+    sprintf(line, "%8u, %4u", tim_a[next], val_a[next]);
     } else {
-    sprintf(line, "%6u, %4u", 0, 0);
+    sprintf(line, "%8u, %4u", 0, 0);
   }
-  Wire.write(line,12);
+  Wire.write(line,14);
   next++;
 }
 
@@ -52,8 +52,9 @@ void dumpTable() {
   Serial.print("Samples: ");
   Serial.println(count);
   for (int i=0;i<count;i++) {
-    sprintf(line, "%6u, %4u", int(tim_a[i]), int(val_a[i]));
+    sprintf(line, "%8u, %4u", int(tim_a[i]), int(val_a[i]));
     Serial.println(line);
+    yield(); //important for ESP8266, lets background processes run!
   }
 }
 
@@ -68,21 +69,25 @@ void getReady() {
 
 void finish() {
   finished=true; 
-  digitalWrite(readyLED, LOW);
   digitalWrite(finishedLED, HIGH);
   dumpTable();
   next=0; 
+  digitalWrite(readyLED, LOW);
 }
 
 void loop() {
-  unsigned val=analogRead(pot);
-  if (val==0) {getReady();}
-  if (val>ant & !finished) { 
-    tim_a[count]=(micros()-bt)/100;
-    val_a[count]=val;
-    ant=val_a[count];
-    if (count<maxSample) { count++; };
-    if (val==1023) {finish();}
+  val=analogRead(pot);
+  if (val<25) {
+    getReady();
+  } else {
+    if (val>ant) {
+      ant=val;
+      if (!finished) {
+        tim_a[count]=micros()-bt;
+        val_a[count]=val;
+        if (count<maxSample) { count++; };
+        if (val>=1023) {finish();}
+      }
+    }
   }
-  delayMicroseconds(1000);
 }

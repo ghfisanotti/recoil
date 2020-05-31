@@ -4,24 +4,17 @@ cartridges and muzzle brakes.
 
 ## Components
 
-- Arduino Nano microcontroller to read the value of a potentiometer as it is moved by the recoil of the rifle.
+- ESP8266 MCU (D1 Mini) to read the values of a potentiometer as it is moved by the recoil of the rifle.
 
-- Raspberry Pi SBC to receive the values acquired by the Arduino, store and display them.
-
-- Logic-level bi-directional converter (2-channels) to connect Raspberry (3.3 volts) I2C bus to Arduino (5 volts) 
-I2C bus.  In theory, as long as the Arduino is configured as slave, it is possible to connect the Raspberry to the 
-Arduino with no risk, but that requires to be shure the Arduino is programmed correctly before connecting both 
-devices.  If done incorrectly, you may damage the Raspberry permanently.
+- Raspberry Pi SBC to receive the values acquired by the MCU, store and display them.
 
 ## Communications
-Arduino and Raspberry are connected by an I2C bus, Raspberry as master, Arduino as slave.
+MCU and Raspberry are connected by an I2C bus, Raspberry as master, MCU as slave.
 
 ## Process
-Arduino stores pairs of values (time, position of the rifle) for the duration of the recoil. It can store up to 
-350 value pairs at a rate of 800 samples/second approximately. The recoil event is assumed to last approximately 20 milliseconds.
-In order to keep memory usage within the RAM capacity of the Nano (2KB), time is stored as a 16-bit unsigned integers 
-(microseconds/100). Position is stored as 16-bit unsigned integers (0-1023 range).
-Value pairs are kept in-memory in a 350-element array, upon request from the Raspberry the values are transmitted 
+MCU stores pairs of values (time, value of potentiometer) for the duration of the recoil. It can store up to 
+1024 value pairs at a rate of 9000 samples/second approximately. The recoil event is assumed to last approximately 20 milliseconds.
+Value pairs are kept in-memory in a 1024-element array, upon request from the Raspberry the values are transmitted 
 over the I2C bus formatted as a CSV (comma separated values) file, one line per value pair.
 
 A Python process on the Raspberry receives the CSV, stores it as a file on disk and can display graphically 
@@ -40,6 +33,11 @@ CSV files can also be imported into any spreadsheet utility for further analysis
 ## Pre-requisites:
 - Tested on Raspberry Pi 1B/2B/4B with Raspbian Buster.
 - Raspberry must have I2C enabled, see raspi-config/Interfacing Options/I2C.
+- On the Raspberry, the following lines must be added to the end of /boot/config.txt
+`
+dtparam=i2c1_baudrate=30000 #GHF I2C speed
+core_freq=250 #GHF I2C clock stability issue
+`
 - GNUplot utility, on the Raspberry:
 
 `
