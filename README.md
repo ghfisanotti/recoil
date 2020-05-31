@@ -36,6 +36,7 @@ CSV files can also be imported into any spreadsheet utility for further analysis
 - On the Raspberry, the following lines must be added to the end of /boot/config.txt
 
 `dtparam=i2c1_baudrate=30000 #GHF I2C speed`
+
 `core_freq=250 #GHF I2C clock stability issue`
 
 - GNUplot utility, on the Raspberry:
