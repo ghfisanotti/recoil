@@ -9,13 +9,13 @@ cartridges and muzzle brakes.
 - Raspberry Pi SBC to receive the values acquired by the MCU, store and display them.
 
 ## Communications
-MCU and Raspberry are connected by an I2C bus, Raspberry as master, MCU as slave.
+MCU and Raspberry are connected by USB cable.
 
 ## Process
 MCU stores pairs of values (time, value of potentiometer) for the duration of the recoil. It can store up to 
 1024 value pairs at a rate of 9000 samples/second approximately. The recoil event is assumed to last approximately 20 milliseconds.
-Value pairs are kept in-memory in a 1024-element array, upon request from the Raspberry the values are transmitted 
-over the I2C bus formatted as a CSV (comma separated values) file, one line per value pair.
+Value pairs are kept in-memory in a 1024-element array, after acquiring the last value, all the data is sent
+over the USB serial bus formatted as a CSV (comma separated values) file, one line per value pair.
 
 A Python process on the Raspberry receives the CSV, stores it as a file on disk and can display graphically 
 various collected files for comparison purposes.
@@ -32,23 +32,11 @@ CSV files can also be imported into any spreadsheet utility for further analysis
 
 ## Pre-requisites:
 - Tested on Raspberry Pi 1B/2B/4B with Raspbian Buster.
-- Raspberry must have I2C enabled, see raspi-config/Interfacing Options/I2C.
-- On the Raspberry, the following lines must be added to the end of /boot/config.txt
-
-```
-dtparam=i2c1_baudrate=30000 #GHF I2C speed
-core_freq=250 #GHF I2C clock stability issue
-```
-
+- On the Raspberry, change the USB port name on serial-read-recoil.py as required.
 - GNUplot utility, on the Raspberry:
 
 `
 	apt install gnuplot
-`
-- SMbus support for I2C, on the Raspberry:
-
-`
-	apt install python-smbus
 `
 
 ## Usage:
@@ -58,7 +46,7 @@ core_freq=250 #GHF I2C clock stability issue
 4. On the Raspberry:
 
 `
-	./i2c-read-recoil.sh
+	./serial-read-recoil.sh
 `
 
 5. Repeat previous steps as desired
